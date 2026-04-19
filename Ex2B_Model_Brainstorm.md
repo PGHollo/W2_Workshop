@@ -177,15 +177,34 @@
  
 
 **Separate Location Table**
-- ✅ More organized and reusable
-- ❌ Slightly more complex
+- More organized and reusable
+- Slightly more complex
 
  
 
 **Location inside Events**
-- ✅ Simpler design
-- ❌ Data duplication risk
+- Simpler design
+- Data duplication risk
 
  
+a) Similarities
 
+Most of our diagrams were very similar. Everyone included the main tables: Events, Attendees, and Registrations. We all understood that attendees can go to multiple events, so we used a Registrations table to connect them.
+
+We also used similar attributes like IDs, names, and dates, and had the same basic relationships (one event → many registrations, one attendee → many registrations).
+
+b) Differences
+
+The biggest difference was how we handled locations.
+
+Some people used a separate Locations table
+Others put location info directly in Events
+
+A separate table is more organized and avoids duplicate data, but it is more complex. Keeping it in Events is simpler, but can lead to repeated data.
+
+Some diagrams also had more or fewer attributes depending on how detailed people wanted to be. More detail is useful but adds complexity.
+
+Overall
+
+We all had the same main idea, but made slightly different design choices based on simplicity vs. organization.
 ---
