@@ -1,0 +1,69 @@
+-- ============================================
+--   LANA'S DOG WALKING — DATABASE SCHEMA
+-- ============================================
+
+-- 1. CLIENTS
+-- Stores all client (dog owner) information
+-- ============================================
+CREATE TABLE clients (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  first_name  VARCHAR(100) NOT NULL,
+  last_name   VARCHAR(100) NOT NULL,
+  email       VARCHAR(255) NOT NULL UNIQUE,
+  phone       VARCHAR(20),
+  address     VARCHAR(255),
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- 2. WALKERS
+-- Stores all dog walker staff information
+-- ============================================
+CREATE TABLE walkers (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  first_name   VARCHAR(100) NOT NULL,
+  last_name    VARCHAR(100) NOT NULL,
+  email        VARCHAR(255) NOT NULL UNIQUE,
+  phone        VARCHAR(20),
+  hourly_rate  DECIMAL(6, 2) NOT NULL,
+  hired_at     TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- 3. DOGS
+-- Stores each dog linked to a client (owner)
+-- ============================================
+CREATE TABLE dogs (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id      UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  name           VARCHAR(100) NOT NULL,
+  breed          VARCHAR(100),
+  size           VARCHAR(20) CHECK (size IN ('small', 'medium', 'large')),
+  age            INT CHECK (age >= 0),
+  special_notes  TEXT
+);
+
+-- ============================================
+-- 4. BOOKINGS
+-- Central table linking clients, dogs & walkers
+-- ============================================
+CREATE TABLE bookings (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id         UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  dog_id            UUID NOT NULL REFERENCES dogs(id) ON DELETE CASCADE,
+  walker_id         UUID NOT NULL REFERENCES walkers(id) ON DELETE SET NULL,
+  walk_date_time    TIMESTAMP NOT NULL,
+  duration_minutes  INT NOT NULL CHECK (duration_minutes > 0),
+  status            VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+  price             DECIMAL(8, 2) NOT NULL CHECK (price >= 0),
+  notes             TEXT
+);
+
+-- ============================================
+-- INDEXES — speeds up common lookups
+-- ============================================
+CREATE INDEX idx_dogs_client       ON dogs(client_id);
+CREATE INDEX idx_bookings_client   ON bookings(client_id);
+CREATE INDEX idx_bookings_dog      ON bookings(dog_id);
+CREATE INDEX idx_bookings_walker   ON bookings(walker_id);
+CREATE INDEX idx_bookings_datetime ON bookings(walk_date_time);
